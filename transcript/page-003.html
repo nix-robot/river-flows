@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code transcript - page 3</title>
+    <style>
+:root { --bg-color: #f5f5f5; --card-bg: #ffffff; --user-bg: #e3f2fd; --user-border: #1976d2; --assistant-bg: #f5f5f5; --assistant-border: #9e9e9e; --thinking-bg: #fff8e1; --thinking-border: #ffc107; --thinking-text: #666; --tool-bg: #f3e5f5; --tool-border: #9c27b0; --tool-result-bg: #e8f5e9; --tool-error-bg: #ffebee; --text-color: #212121; --text-muted: #757575; --code-bg: #263238; --code-text: #aed581; }
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding: 16px; line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 1.5rem; margin-bottom: 24px; padding-bottom: 8px; border-bottom: 2px solid var(--user-border); }
+.header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid var(--user-border); padding-bottom: 8px; margin-bottom: 24px; }
+.header-row h1 { border-bottom: none; padding-bottom: 0; margin-bottom: 0; flex: 1; min-width: 200px; }
+.message { margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.message.user { background: var(--user-bg); border-left: 4px solid var(--user-border); }
+.message.assistant { background: var(--card-bg); border-left: 4px solid var(--assistant-border); }
+.message.tool-reply { background: #fff8e1; border-left: 4px solid #ff9800; }
+.tool-reply .role-label { color: #e65100; }
+.tool-reply .tool-result { background: transparent; padding: 0; margin: 0; }
+.tool-reply .tool-result .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff8e1); }
+.message-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: rgba(0,0,0,0.03); font-size: 0.85rem; }
+.role-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.user .role-label { color: var(--user-border); }
+time { color: var(--text-muted); font-size: 0.8rem; }
+.timestamp-link { color: inherit; text-decoration: none; }
+.timestamp-link:hover { text-decoration: underline; }
+.message:target { animation: highlight 2s ease-out; }
+@keyframes highlight { 0% { background-color: rgba(25, 118, 210, 0.2); } 100% { background-color: transparent; } }
+.message-content { padding: 16px; }
+.message-content p { margin: 0 0 12px 0; }
+.message-content p:last-child { margin-bottom: 0; }
+.thinking { background: var(--thinking-bg); border: 1px solid var(--thinking-border); border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 0.9rem; color: var(--thinking-text); }
+.thinking-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #f57c00; margin-bottom: 8px; }
+.thinking p { margin: 8px 0; }
+.assistant-text { margin: 8px 0; }
+.tool-use { background: var(--tool-bg); border: 1px solid var(--tool-border); border-radius: 8px; padding: 12px; margin: 12px 0; }
+.tool-header { font-weight: 600; color: var(--tool-border); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.tool-icon { font-size: 1.1rem; }
+.tool-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+.tool-result { background: var(--tool-result-bg); border-radius: 8px; padding: 12px; margin: 12px 0; }
+.tool-result.tool-error { background: var(--tool-error-bg); }
+.file-tool { border-radius: 8px; padding: 12px; margin: 12px 0; }
+.write-tool { background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%); border: 1px solid #4caf50; }
+.edit-tool { background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%); border: 1px solid #ff9800; }
+.file-tool-header { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.write-header { color: #2e7d32; }
+.edit-header { color: #e65100; }
+.file-tool-icon { font-size: 1rem; }
+.file-tool-path { font-family: monospace; background: rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 4px; }
+.file-tool-fullpath { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; word-break: break-all; }
+.file-content { margin: 0; }
+.edit-section { display: flex; margin: 4px 0; border-radius: 4px; overflow: hidden; }
+.edit-label { padding: 8px 12px; font-weight: bold; font-family: monospace; display: flex; align-items: flex-start; }
+.edit-old { background: #fce4ec; }
+.edit-old .edit-label { color: #b71c1c; background: #f8bbd9; }
+.edit-old .edit-content { color: #880e4f; }
+.edit-new { background: #e8f5e9; }
+.edit-new .edit-label { color: #1b5e20; background: #a5d6a7; }
+.edit-new .edit-content { color: #1b5e20; }
+.edit-content { margin: 0; flex: 1; background: transparent; font-size: 0.85rem; }
+.edit-replace-all { font-size: 0.75rem; font-weight: normal; color: var(--text-muted); }
+.write-tool .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #e6f4ea); }
+.edit-tool .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff0e5); }
+.todo-list { background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border: 1px solid #81c784; border-radius: 8px; padding: 12px; margin: 12px 0; }
+.todo-header { font-weight: 600; color: #2e7d32; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.todo-items { list-style: none; margin: 0; padding: 0; }
+.todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 0.9rem; }
+.todo-item:last-child { border-bottom: none; }
+.todo-icon { flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 50%; }
+.todo-completed .todo-icon { color: #2e7d32; background: rgba(46, 125, 50, 0.15); }
+.todo-completed .todo-content { color: #558b2f; text-decoration: line-through; }
+.todo-in-progress .todo-icon { color: #f57c00; background: rgba(245, 124, 0, 0.15); }
+.todo-in-progress .todo-content { color: #e65100; font-weight: 500; }
+.todo-pending .todo-icon { color: #757575; background: rgba(0,0,0,0.05); }
+.todo-pending .todo-content { color: #616161; }
+pre { background: var(--code-bg); color: var(--code-text); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 8px 0; white-space: pre-wrap; word-wrap: break-word; }
+pre.json { color: #e0e0e0; }
+code { background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+pre code { background: none; padding: 0; }
+.user-content { margin: 0; }
+.truncatable { position: relative; }
+.truncatable.truncated .truncatable-content { max-height: 200px; overflow: hidden; }
+.truncatable.truncated::after { content: ''; position: absolute; bottom: 32px; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, transparent, var(--card-bg)); pointer-events: none; }
+.message.user .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--user-bg)); }
+.message.tool-reply .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff8e1); }
+.tool-use .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--tool-bg)); }
+.tool-result .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--tool-result-bg)); }
+.expand-btn { display: none; width: 100%; padding: 8px 16px; margin-top: 4px; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
+.expand-btn:hover { background: rgba(0,0,0,0.1); }
+.truncatable.truncated .expand-btn, .truncatable.expanded .expand-btn { display: block; }
+.pagination { display: flex; justify-content: center; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+.pagination a, .pagination span { padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
+.pagination a { background: var(--card-bg); color: var(--user-border); border: 1px solid var(--user-border); }
+.pagination a:hover { background: var(--user-bg); }
+.pagination .current { background: var(--user-border); color: white; }
+.pagination .disabled { color: var(--text-muted); border: 1px solid #ddd; }
+.pagination .index-link { background: var(--user-border); color: white; }
+details.continuation { margin-bottom: 16px; }
+details.continuation summary { cursor: pointer; padding: 12px 16px; background: var(--user-bg); border-left: 4px solid var(--user-border); border-radius: 12px; font-weight: 500; color: var(--text-muted); }
+details.continuation summary:hover { background: rgba(25, 118, 210, 0.15); }
+details.continuation[open] summary { border-radius: 12px 12px 0 0; margin-bottom: 0; }
+.index-item { margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: var(--user-bg); border-left: 4px solid var(--user-border); }
+.index-item a { display: block; text-decoration: none; color: inherit; }
+.index-item a:hover { background: rgba(25, 118, 210, 0.1); }
+.index-item-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: rgba(0,0,0,0.03); font-size: 0.85rem; }
+.index-item-number { font-weight: 600; color: var(--user-border); }
+.index-item-content { padding: 16px; }
+.index-item-stats { padding: 8px 16px 12px 32px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(0,0,0,0.06); }
+.index-item-commit { margin-top: 6px; padding: 4px 8px; background: #fff3e0; border-radius: 4px; font-size: 0.85rem; color: #e65100; }
+.index-item-commit code { background: rgba(0,0,0,0.08); padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; margin-right: 6px; }
+.commit-card { margin: 8px 0; padding: 10px 14px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 6px; }
+.commit-card a { text-decoration: none; color: #5d4037; display: block; }
+.commit-card a:hover { color: #e65100; }
+.commit-card-hash { font-family: monospace; color: #e65100; font-weight: 600; margin-right: 8px; }
+.index-commit { margin-bottom: 12px; padding: 10px 16px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.index-commit a { display: block; text-decoration: none; color: inherit; }
+.index-commit a:hover { background: rgba(255, 152, 0, 0.1); margin: -10px -16px; padding: 10px 16px; border-radius: 8px; }
+.index-commit-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 4px; }
+.index-commit-hash { font-family: monospace; color: #e65100; font-weight: 600; }
+.index-commit-msg { color: #5d4037; }
+.index-item-long-text { margin-top: 8px; padding: 12px; background: var(--card-bg); border-radius: 8px; border-left: 3px solid var(--assistant-border); }
+.index-item-long-text .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--card-bg)); }
+.index-item-long-text-content { color: var(--text-color); }
+#search-box { display: none; align-items: center; gap: 8px; }
+#search-box input { padding: 6px 12px; border: 1px solid var(--assistant-border); border-radius: 6px; font-size: 16px; width: 180px; }
+#search-box button, #modal-search-btn, #modal-close-btn { background: var(--user-border); color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+#search-box button:hover, #modal-search-btn:hover { background: #1565c0; }
+#modal-close-btn { background: var(--text-muted); margin-left: 8px; }
+#modal-close-btn:hover { background: #616161; }
+#search-modal[open] { border: none; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); padding: 0; width: 90vw; max-width: 900px; height: 80vh; max-height: 80vh; display: flex; flex-direction: column; }
+#search-modal::backdrop { background: rgba(0,0,0,0.5); }
+.search-modal-header { display: flex; align-items: center; gap: 8px; padding: 16px; border-bottom: 1px solid var(--assistant-border); background: var(--bg-color); border-radius: 12px 12px 0 0; }
+.search-modal-header input { flex: 1; padding: 8px 12px; border: 1px solid var(--assistant-border); border-radius: 6px; font-size: 16px; }
+#search-status { padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.06); }
+#search-results { flex: 1; overflow-y: auto; padding: 16px; }
+.search-result { margin-bottom: 16px; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.search-result a { display: block; text-decoration: none; color: inherit; }
+.search-result a:hover { background: rgba(25, 118, 210, 0.05); }
+.search-result-page { padding: 6px 12px; background: rgba(0,0,0,0.03); font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.06); }
+.search-result-content { padding: 12px; }
+.search-result mark { background: #fff59d; padding: 1px 2px; border-radius: 2px; }
+@media (max-width: 600px) { body { padding: 8px; } .message, .index-item { border-radius: 8px; } .message-content, .index-item-content { padding: 12px; } pre { font-size: 0.8rem; padding: 8px; } #search-box input { width: 120px; } #search-modal[open] { width: 95vw; height: 90vh; } }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1><a href="index.html" style="color: inherit; text-decoration: none;">Claude Code transcript</a> - page 3/3</h1>
+        
+
+<div class="pagination">
+<a href="index.html" class="index-link">Index</a>
+<a href="page-002.html">&larr; Prev</a>
+<a href="page-001.html">1</a>
+<a href="page-002.html">2</a>
+<span class="current">3</span>
+<span class="disabled">Next &rarr;</span>
+</div>
+
+        
+<div class="message user" id="msg-2026-03-22T18-21-21-402Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-03-22T18-21-21-402Z" class="timestamp-link"><time datetime="2026-03-22T18:21:21.402Z" data-timestamp="2026-03-22T18:21:21.402Z">2026-03-22T18:21:21.402Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Base directory for this skill: /Users/nix/.claude/skills/frontend-design</p>
+<p>This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.</p>
+<p>The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.</p>
+<h2>Design Thinking</h2>
+<p>Before coding, understand the context and commit to a BOLD aesthetic direction:
+- <strong>Purpose</strong>: What problem does this interface solve? Who uses it?
+- <strong>Tone</strong>: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.
+- <strong>Constraints</strong>: Technical requirements (framework, performance, accessibility).
+- <strong>Differentiation</strong>: What makes this UNFORGETTABLE? What's the one thing someone will remember?</p>
+<p><strong>CRITICAL</strong>: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.</p>
+<p>Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
+- Production-grade and functional
+- Visually striking and memorable
+- Cohesive with a clear aesthetic point-of-view
+- Meticulously refined in every detail</p>
+<h2>Frontend Aesthetics Guidelines</h2>
+<p>Focus on:
+- <strong>Typography</strong>: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
+- <strong>Color &amp; Theme</strong>: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
+- <strong>Motion</strong>: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
+- <strong>Spatial Composition</strong>: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
+- <strong>Backgrounds &amp; Visual Details</strong>: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.</p>
+<p>NEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character.</p>
+<p>Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.</p>
+<p><strong>IMPORTANT</strong>: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.</p>
+<p>Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.</p>
+<p>ARGUMENTS: Redesign the California River Flows dashboard at /tmp/river-flows/index.html. It's a static HTML page generated by a Python script at /tmp/river-flows/build_dashboard.py that fetches USGS river flow data. The dashboard shows Kern River and American River stations with flow cards, stats, and charts. Make it visually distinctive and polished.</p></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-21-33-681Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-21-33-681Z" class="timestamp-link"><time datetime="2026-03-22T18:21:33.681Z" data-timestamp="2026-03-22T18:21:33.681Z">2026-03-22T18:21:33.681Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-21-34-256Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-21-34-256Z" class="timestamp-link"><time datetime="2026-03-22T18:21:34.256Z" data-timestamp="2026-03-22T18:21:34.256Z">2026-03-22T18:21:34.256Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Let me study the current script structure, then redesign with a bold topographic/cartographic aesthetic that fits the river theme.</p></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-21-34-421Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-21-34-421Z" class="timestamp-link"><time datetime="2026-03-22T18:21:34.421Z" data-timestamp="2026-03-22T18:21:34.421Z">2026-03-22T18:21:34.421Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01Bc1F9pKQVWiq8Xy8nfAdEV"><div class="tool-header"><span class="tool-icon">⚙</span> Read</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;file_path&#34;: &#34;/tmp/river-flows/build_dashboard.py&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-21-34-640Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-21-34-640Z" class="timestamp-link"><time datetime="2026-03-22T18:21:34.640Z" data-timestamp="2026-03-22T18:21:34.640Z">2026-03-22T18:21:34.640Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>     1→#!/usr/bin/env python3
+     2→# /// script
+     3→# requires-python = &quot;&gt;=3.11&quot;
+     4→# dependencies = [&quot;httpx&quot;]
+     5→# ///
+     6→&quot;&quot;&quot;Fetch USGS flow data for California river stations and build a static HTML dashboard.&quot;&quot;&quot;
+     7→
+     8→import httpx
+     9→import json
+    10→from datetime import datetime, timezone
+    11→
+    12→RIVERS = {
+    13→    &quot;Kern River&quot;: {
+    14→        &quot;stations&quot;: {
+    15→            &quot;11189500&quot;: &quot;SF Kern River nr Onyx&quot;,
+    16→            &quot;11186000&quot;: &quot;Kern River nr Kernville&quot;,
+    17→            &quot;11194152&quot;: &quot;Kern River at Bakersfield&quot;,
+    18→        },
+    19→        &quot;color&quot;: &quot;#2563eb&quot;,
+    20→    },
+    21→    &quot;American River&quot;: {
+    22→        &quot;stations&quot;: {
+    23→            &quot;11427000&quot;: &quot;NF American River at North Fork Dam&quot;,
+    24→            &quot;11446500&quot;: &quot;American River at Fair Oaks&quot;,
+    25→        },
+    26→        &quot;color&quot;: &quot;#059669&quot;,
+    27→    },
+    28→}
+    29→
+    30→USGS_IV_URL = &quot;https://waterservices.usgs.gov/nwis/iv/&quot;
+    31→USGS_DV_URL = &quot;https://waterservices.usgs.gov/nwis/dv/&quot;
+    32→
+    33→
+    34→def all_site_ids() -&gt; list[str]:
+    35→    ids = []
+    36→    for river in RIVERS.values():
+    37→        ids.extend(river[&quot;stations&quot;].keys())
+    38→    return ids
+    39→
+    40→
+    41→def fetch_instantaneous(site_ids: list[str], period: str = &quot;P7D&quot;) -&gt; dict:
+    42→    resp = httpx.get(
+    43→        USGS_IV_URL,
+    44→        params={
+    45→            &quot;format&quot;: &quot;json&quot;,
+    46→            &quot;sites&quot;: &quot;,&quot;.join(site_ids),
+    47→            &quot;parameterCd&quot;: &quot;00060&quot;,
+    48→            &quot;period&quot;: period,
+    49→        },
+    50→        timeout=30,
+    51→    )
+    52→    resp.raise_for_status()
+    53→    return resp.json()
+    54→
+    55→
+    56→def fetch_daily(site_ids: list[str], period: str = &quot;P365D&quot;) -&gt; dict:
+    57→    resp = httpx.get(
+    58→        USGS_DV_URL,
+    59→        params={
+    60→            &quot;format&quot;: &quot;json&quot;,
+    61→            &quot;sites&quot;: &quot;,&quot;.join(site_ids),
+    62→            &quot;parameterCd&quot;: &quot;00060&quot;,
+    63→            &quot;period&quot;: period,
+    64→        },
+    65→        timeout=30,
+    66→    )
+    67→    resp.raise_for_status()
+    68→    return resp.json()
+    69→
+    70→
+    71→def extract_series(raw: dict) -&gt; dict[str, dict]:
+    72→    result = {}
+    73→    for ts in raw[&quot;value&quot;][&quot;timeSeries&quot;]:
+    74→        site = ts[&quot;sourceInfo&quot;][&quot;siteCode&quot;][0][&quot;value&quot;]
+    75→        name = ts[&quot;sourceInfo&quot;][&quot;siteName&quot;]
+    76→        values = [
+    77→            {&quot;t&quot;: v[&quot;dateTime&quot;], &quot;v&quot;: float(v[&quot;value&quot;]) if v[&quot;value&quot;] != &quot;&quot; else None}
+    78→            for v in ts[&quot;values&quot;][0][&quot;value&quot;]
+    79→            if v[&quot;value&quot;] not in (&quot;&quot;, &quot;-999999&quot;)
+    80→        ]
+    81→        result[site] = {&quot;name&quot;: name, &quot;values&quot;: values}
+    82→    return result
+    83→
+    84→
+    85→def compute_stats(values: list[dict]) -&gt; dict:
+    86→    nums = [v[&quot;v&quot;] for v in values if v[&quot;v&quot;] is not None]
+    87→    if not nums:
+    88→        return {&quot;min&quot;: None, &quot;max&quot;: None, &quot;avg&quot;: None, &quot;current&quot;: None, &quot;trend&quot;: None}
+    89→    current = nums[-1]
+    90→    avg = sum(nums) / len(nums)
+    91→    # trend: compare last value to avg of first quarter
+    92→    quarter = max(1, len(nums) // 4)
+    93→    early_avg = sum(nums[:quarter]) / quarter
+    94→    if early_avg &gt; 0:
+    95→        pct = ((current - early_avg) / early_avg) * 100
+    96→    else:
+    97→        pct = 0
+    98→    return {
+    99→        &quot;min&quot;: min(nums),
+   100→        &quot;max&quot;: max(nums),
+   101→        &quot;avg&quot;: avg,
+   102→        &quot;current&quot;: current,
+   103→        &quot;trend&quot;: pct,
+   104→    }
+   105→
+   106→
+   107→def build_html(iv_data: dict, dv_data: dict) -&gt; str:
+   108→    updated = datetime.now(timezone.utc).strftime(&quot;%Y-%m-%d %H:%M UTC&quot;)
+   109→
+   110→    # Build river sections
+   111→    river_sections = &quot;&quot;
+   112→    all_chart_data = {}  # river_name -&gt; {iv: [...], dv: [...]}
+   113→
+   114→    station_colors = [
+   115→        &quot;#60a5fa&quot;, &quot;#34d399&quot;, &quot;#fbbf24&quot;, &quot;#f87171&quot;, &quot;#a78bfa&quot;,
+   116→        &quot;#38bdf8&quot;, &quot;#4ade80&quot;, &quot;#facc15&quot;, &quot;#fb923c&quot;, &quot;#c084fc&quot;,
+   117→    ]
+   118→    color_idx = 0
+   119→
+   120→    for river_name, river_info in RIVERS.items():
+   121→        river_color = river_info[&quot;color&quot;]
+   122→        cards = &quot;&quot;
+   123→        iv_datasets = []
+   124→        dv_datasets = []
+   125→
+   126→        for site_id, label in river_info[&quot;stations&quot;].items():
+   127→            iv = iv_data.get(site_id, {&quot;name&quot;: label, &quot;values&quot;: []})
+   128→            dv = dv_data.get(site_id, {&quot;name&quot;: label, &quot;values&quot;: []})
+   129→            name = iv.get(&quot;name&quot;) or dv.get(&quot;name&quot;) or label
+   130→            color = station_colors[color_idx % len(station_colors)]
+   131→            color_idx += 1
+   132→
+   133→            iv_stats = compute_stats(iv[&quot;values&quot;])
+   134→            dv_stats = compute_stats(dv[&quot;values&quot;])
+   135→            stats = iv_stats if iv_stats[&quot;current&quot;] is not None else dv_stats
+   136→
+   137→            current = f&#x27;{stats[&quot;current&quot;]:.0f}&#x27; if stats[&quot;current&quot;] is not None else &quot;N/A&quot;
+   138→            has_data = stats[&quot;current&quot;] is not None
+   139→            status_class = &quot;active&quot; if has_data else &quot;inactive&quot;
+   140→
+   141→            trend_html = &quot;&quot;
+   142→            if stats[&quot;trend&quot;] is not None and has_data:
+   143→                arrow = &quot;&amp;#9650;&quot; if stats[&quot;trend&quot;] &gt; 5 else &quot;&amp;#9660;&quot; if stats[&quot;trend&quot;] &lt; -5 else &quot;&amp;#9654;&quot;
+   144→                trend_class = &quot;up&quot; if stats[&quot;trend&quot;] &gt; 5 else &quot;down&quot; if stats[&quot;trend&quot;] &lt; -5 else &quot;flat&quot;
+   145→                trend_html = f&#x27;&lt;span class=&quot;trend {trend_class}&quot;&gt;{arrow} {abs(stats[&quot;trend&quot;]):.0f}%&lt;/span&gt;&#x27;
+   146→
+   147→            stats_row = &quot;&quot;
+   148→            if has_data:
+   149→                s = iv_stats if iv_stats[&quot;current&quot;] is not None else dv_stats
+   150→                stats_row = f&quot;&quot;&quot;
+   151→                &lt;div class=&quot;stats-row&quot;&gt;
+   152→                  &lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;stat-label&quot;&gt;Min&lt;/span&gt;&lt;span class=&quot;stat-value&quot;&gt;{s[&#x27;min&#x27;]:.0f}&lt;/span&gt;&lt;/div&gt;
+   153→                  &lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;stat-label&quot;&gt;Avg&lt;/span&gt;&lt;span class=&quot;stat-value&quot;&gt;{s[&#x27;avg&#x27;]:.0f}&lt;/span&gt;&lt;/div&gt;
+   154→                  &lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;stat-label&quot;&gt;Max&lt;/span&gt;&lt;span class=&quot;stat-value&quot;&gt;{s[&#x27;max&#x27;]:.0f}&lt;/span&gt;&lt;/div&gt;
+   155→                &lt;/div&gt;&quot;&quot;&quot;
+   156→
+   157→            cards += f&quot;&quot;&quot;
+   158→            &lt;div class=&quot;card {status_class}&quot;&gt;
+   159→              &lt;div class=&quot;card-dot&quot; style=&quot;background:{color}&quot;&gt;&lt;/div&gt;
+   160→              &lt;div class=&quot;card-name&quot;&gt;{name}&lt;/div&gt;
+   161→              &lt;div class=&quot;card-flow&quot;&gt;
+   162→                &lt;span class=&quot;flow-value&quot;&gt;{current}&lt;/span&gt;
+   163→                &lt;span class=&quot;flow-unit&quot;&gt;cfs&lt;/span&gt;
+   164→                {trend_html}
+   165→              &lt;/div&gt;
+   166→              {stats_row}
+   167→              &lt;div class=&quot;card-meta&quot;&gt;Site {site_id}&lt;/div&gt;
+   168→            &lt;/div&gt;&quot;&quot;&quot;
+   169→
+   170→            if iv[&quot;values&quot;]:
+   171→                iv_datasets.append({
+   172→                    &quot;label&quot;: name,
+   173→                    &quot;data&quot;: [{&quot;x&quot;: v[&quot;t&quot;], &quot;y&quot;: v[&quot;v&quot;]} for v in iv[&quot;values&quot;] if v[&quot;v&quot;] is not None],
+   174→                    &quot;borderColor&quot;: color,
+   175→                    &quot;backgroundColor&quot;: color + &quot;18&quot;,
+   176→                    &quot;fill&quot;: True,
+   177→                    &quot;tension&quot;: 0.3,
+   178→                    &quot;pointRadius&quot;: 0,
+   179→                    &quot;borderWidth&quot;: 2,
+   180→                })
+   181→
+   182→            if dv[&quot;values&quot;]:
+   183→                dv_datasets.append({
+   184→                    &quot;label&quot;: name,
+   185→                    &quot;data&quot;: [{&quot;x&quot;: v[&quot;t&quot;], &quot;y&quot;: v[&quot;v&quot;]} for v in dv[&quot;values&quot;] if v[&quot;v&quot;] is not None],
+   186→                    &quot;borderColor&quot;: color,
+   187→                    &quot;backgroundColor&quot;: color + &quot;18&quot;,
+   188→                    &quot;fill&quot;: True,
+   189→                    &quot;tension&quot;: 0.3,
+   190→                    &quot;pointRadius&quot;: 0,
+   191→                    &quot;borderWidth&quot;: 2,
+   192→                })
+   193→
+   194→        river_id = river_name.replace(&quot; &quot;, &quot;&quot;).lower()
+   195→        all_chart_data[river_id] = {&quot;iv&quot;: iv_datasets, &quot;dv&quot;: dv_datasets}
+   196→
+   197→        river_sections += f&quot;&quot;&quot;
+   198→        &lt;section class=&quot;river-section&quot;&gt;
+   199→          &lt;h2 class=&quot;river-title&quot;&gt;&lt;span class=&quot;river-dot&quot; style=&quot;background:{river_color}&quot;&gt;&lt;/span&gt;{river_name}&lt;/h2&gt;
+   200→          &lt;div class=&quot;cards&quot;&gt;{cards}&lt;/div&gt;
+   201→          &lt;div class=&quot;chart-panel&quot;&gt;
+   202→            &lt;div class=&quot;chart-tabs&quot;&gt;
+   203→              &lt;button class=&quot;tab active&quot; onclick=&quot;showTab(&#x27;{river_id}&#x27;, &#x27;7d&#x27;)&quot;&gt;7 Day&lt;/button&gt;
+   204→              &lt;button class=&quot;tab&quot; onclick=&quot;showTab(&#x27;{river_id}&#x27;, &#x27;365d&#x27;)&quot;&gt;365 Day&lt;/button&gt;
+   205→            &lt;/div&gt;
+   206→            &lt;div class=&quot;chart-wrap&quot;&gt;
+   207→              &lt;canvas id=&quot;{river_id}-7d&quot;&gt;&lt;/canvas&gt;
+   208→              &lt;canvas id=&quot;{river_id}-365d&quot; style=&quot;display:none&quot;&gt;&lt;/canvas&gt;
+   209→            &lt;/div&gt;
+   210→          &lt;/div&gt;
+   211→        &lt;/section&gt;&quot;&quot;&quot;
+   212→
+   213→    chart_data_json = json.dumps(all_chart_data)
+   214→
+   215→    return f&quot;&quot;&quot;&lt;!DOCTYPE html&gt;
+   216→&lt;html lang=&quot;en&quot;&gt;
+   217→&lt;head&gt;
+   218→&lt;meta charset=&quot;UTF-8&quot;&gt;
+   219→&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+   220→&lt;title&gt;California River Flows&lt;/title&gt;
+   221→&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js@4&quot;&gt;&lt;/script&gt;
+   222→&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3&quot;&gt;&lt;/script&gt;
+   223→&lt;style&gt;
+   224→  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+   225→  body {{
+   226→    font-family: -apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Roboto, sans-serif;
+   227→    background: #0f172a; color: #e2e8f0; line-height: 1.5;
+   228→    padding: 1rem 1rem 2rem; max-width: 1200px; margin: 0 auto;
+   229→  }}
+   230→  header {{ margin-bottom: 2rem; }}
+   231→  h1 {{ font-size: 1.6rem; font-weight: 700; }}
+   232→  .subtitle {{ color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; }}
+   233→  .river-section {{ margin-bottom: 2.5rem; }}
+   234→  .river-title {{
+   235→    font-size: 1.15rem; font-weight: 600; color: #f1f5f9;
+   236→    display: flex; align-items: center; gap: 0.5rem;
+   237→    margin-bottom: 1rem; padding-bottom: 0.5rem;
+   238→    border-bottom: 1px solid #1e293b;
+   239→  }}
+   240→  .river-dot {{ width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }}
+   241→  .cards {{
+   242→    display: grid;
+   243→    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+   244→    gap: 0.75rem; margin-bottom: 1rem;
+   245→  }}
+   246→  .card {{
+   247→    background: #1e293b; border-radius: 10px; padding: 1rem;
+   248→    border: 1px solid #334155; position: relative; overflow: hidden;
+   249→  }}
+   250→  .card.inactive {{ opacity: 0.5; }}
+   251→  .card-dot {{
+   252→    width: 8px; height: 8px; border-radius: 50%;
+   253→    position: absolute; top: 1rem; right: 1rem;
+   254→  }}
+   255→  .card-name {{ font-size: 0.78rem; color: #94a3b8; font-weight: 500; margin-bottom: 0.5rem; padding-right: 1rem; }}
+   256→  .card-flow {{ display: flex; align-items: baseline; gap: 0.35rem; margin-bottom: 0.5rem; }}
+   257→  .flow-value {{ font-size: 1.75rem; font-weight: 700; color: #f1f5f9; }}
+   258→  .flow-unit {{ font-size: 0.8rem; color: #64748b; }}
+   259→  .trend {{ font-size: 0.75rem; font-weight: 600; margin-left: 0.25rem; }}
+   260→  .trend.up {{ color: #34d399; }}
+   261→  .trend.down {{ color: #f87171; }}
+   262→  .trend.flat {{ color: #94a3b8; }}
+   263→  .stats-row {{
+   264→    display: flex; gap: 1rem; padding-top: 0.5rem;
+   265→    border-top: 1px solid #334155; margin-top: 0.25rem;
+   266→  }}
+   267→  .stat {{ display: flex; flex-direction: column; }}
+   268→  .stat-label {{ font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }}
+   269→  .stat-value {{ font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }}
+   270→  .card-meta {{ font-size: 0.65rem; color: #475569; margin-top: 0.5rem; }}
+   271→  .chart-panel {{
+   272→    background: #1e293b; border-radius: 10px; padding: 1rem;
+   273→    border: 1px solid #334155;
+   274→  }}
+   275→  .chart-tabs {{ display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }}
+   276→  .tab {{
+   277→    background: #0f172a; border: 1px solid #334155; color: #94a3b8;
+   278→    padding: 0.35rem 1rem; border-radius: 6px; cursor: pointer;
+   279→    font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
+   280→  }}
+   281→  .tab:hover {{ color: #e2e8f0; border-color: #475569; }}
+   282→  .tab.active {{ background: #334155; color: #f1f5f9; border-color: #475569; }}
+   283→  .chart-wrap {{ position: relative; height: 280px; }}
+   284→  .chart-wrap canvas {{ position: absolute; inset: 0; }}
+   285→  footer {{ text-align: center; color: #475569; font-size: 0.7rem; padding-top: 1rem; }}
+   286→  @media (max-width: 600px) {{
+   287→    h1 {{ font-size: 1.3rem; }}
+   288→    .cards {{ grid-template-columns: 1fr; }}
+   289→    .flow-value {{ font-size: 1.5rem; }}
+   290→    .chart-wrap {{ height: 220px; }}
+   291→  }}
+   292→&lt;/style&gt;
+   293→&lt;/head&gt;
+   294→&lt;body&gt;
+   295→  &lt;header&gt;
+   296→    &lt;h1&gt;California River Flows&lt;/h1&gt;
+   297→    &lt;p class=&quot;subtitle&quot;&gt;USGS real-time discharge &amp;middot; Updated {updated}&lt;/p&gt;
+   298→  &lt;/header&gt;
+   299→  {river_sections}
+   300→  &lt;footer&gt;Data from USGS National Water Information System &amp;middot; &lt;a href=&quot;transcript/&quot; style=&quot;color:#64748b&quot;&gt;Build transcript&lt;/a&gt;&lt;/footer&gt;
+   301→
+   302→&lt;script&gt;
+   303→const chartData = {chart_data_json};
+   304→const charts = {{}};
+   305→
+   306→function makeChart(canvasId, datasets, timeUnit) {{
+   307→  const ctx = document.getElementById(canvasId);
+   308→  if (!ctx) return;
+   309→  charts[canvasId] = new Chart(ctx, {{
+   310→    type: &#x27;line&#x27;,
+   311→    data: {{ datasets }},
+   312→    options: {{
+   313→      responsive: true,
+   314→      maintainAspectRatio: false,
+   315→      interaction: {{ mode: &#x27;index&#x27;, intersect: false }},
+   316→      plugins: {{
+   317→        legend: {{ position: &#x27;top&#x27;, labels: {{ color: &#x27;#94a3b8&#x27;, usePointStyle: true, pointStyle: &#x27;circle&#x27;, boxWidth: 6, padding: 16, font: {{ size: 11 }} }} }},
+   318→        tooltip: {{
+   319→          backgroundColor: &#x27;#1e293b&#x27;, titleColor: &#x27;#f1f5f9&#x27;, bodyColor: &#x27;#cbd5e1&#x27;,
+   320→          borderColor: &#x27;#334155&#x27;, borderWidth: 1, padding: 10,
+   321→          callbacks: {{ label: ctx =&gt; ctx.dataset.label + &#x27;: &#x27; + (ctx.parsed.y?.toLocaleString() ?? &#x27;N/A&#x27;) + &#x27; cfs&#x27; }}
+   322→        }}
+   323→      }},
+   324→      scales: {{
+   325→        x: {{
+   326→          type: &#x27;time&#x27;, time: {{ unit: timeUnit }},
+   327→          ticks: {{ color: &#x27;#64748b&#x27;, maxTicksLimit: 8, font: {{ size: 10 }} }},
+   328→          grid: {{ color: &#x27;#1e293b&#x27; }}
+   329→        }},
+   330→        y: {{
+   331→          title: {{ display: true, text: &#x27;cfs&#x27;, color: &#x27;#64748b&#x27;, font: {{ size: 10 }} }},
+   332→          ticks: {{ color: &#x27;#64748b&#x27;, font: {{ size: 10 }}, callback: v =&gt; v.toLocaleString() }},
+   333→          grid: {{ color: &#x27;#1e293b44&#x27; }},
+   334→          beginAtZero: true
+   335→        }}
+   336→      }}
+   337→    }}
+   338→  }});
+   339→}}
+   340→
+   341→for (const [riverId, data] of Object.entries(chartData)) {{
+   342→  makeChart(riverId + &#x27;-7d&#x27;, data.iv, &#x27;day&#x27;);
+   343→  makeChart(riverId + &#x27;-365d&#x27;, data.dv, &#x27;month&#x27;);
+   344→}}
+   345→
+   346→function showTab(riverId, period) {{
+   347→  const section = document.getElementById(riverId + &#x27;-7d&#x27;)?.closest(&#x27;.chart-panel&#x27;);
+   348→  if (!section) return;
+   349→  section.querySelectorAll(&#x27;canvas&#x27;).forEach(c =&gt; c.style.display = &#x27;none&#x27;);
+   350→  section.querySelectorAll(&#x27;.tab&#x27;).forEach(t =&gt; t.classList.remove(&#x27;active&#x27;));
+   351→  const canvas = document.getElementById(riverId + &#x27;-&#x27; + period);
+   352→  if (canvas) canvas.style.display = &#x27;block&#x27;;
+   353→  const tabs = section.querySelectorAll(&#x27;.tab&#x27;);
+   354→  tabs.forEach(t =&gt; {{ if (t.textContent.toLowerCase().includes(period.replace(&#x27;d&#x27;,&#x27;&#x27;))) t.classList.add(&#x27;active&#x27;); }});
+   355→  const chartKey = riverId + &#x27;-&#x27; + period;
+   356→  if (charts[chartKey]) charts[chartKey].resize();
+   357→}}
+   358→&lt;/script&gt;
+   359→&lt;/body&gt;
+   360→&lt;/html&gt;&quot;&quot;&quot;
+   361→
+   362→
+   363→def main():
+   364→    site_ids = all_site_ids()
+   365→    print(&quot;Fetching instantaneous values (7 days)...&quot;)
+   366→    iv_raw = fetch_instantaneous(site_ids)
+   367→    iv_data = extract_series(iv_raw)
+   368→
+   369→    print(&quot;Fetching daily values (365 days)...&quot;)
+   370→    dv_raw = fetch_daily(site_ids)
+   371→    dv_data = extract_series(dv_raw)
+   372→
+   373→    print(&quot;Building dashboard...&quot;)
+   374→    html = build_html(iv_data, dv_data)
+   375→
+   376→    with open(&quot;index.html&quot;, &quot;w&quot;) as f:
+   377→        f.write(html)
+   378→    print(&quot;Wrote index.html&quot;)
+   379→
+   380→
+   381→if __name__ == &quot;__main__&quot;:
+   382→    main()
+   383→</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-21-44-956Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-21-44-956Z" class="timestamp-link"><time datetime="2026-03-22T18:21:44.956Z" data-timestamp="2026-03-22T18:21:44.956Z">2026-03-22T18:21:44.956Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-21-46-635Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-21-46-635Z" class="timestamp-link"><time datetime="2026-03-22T18:21:46.635Z" data-timestamp="2026-03-22T18:21:46.635Z">2026-03-22T18:21:46.635Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now I'll redesign with a <strong>cartographic/topographic</strong> aesthetic — the dashboard should feel like a living USGS survey map reimagined digitally. Warm parchment tones, contour-line textures, monospace gauge readings, flowing SVG dividers.</p></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-23-49-172Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-23-49-172Z" class="timestamp-link"><time datetime="2026-03-22T18:23:49.172Z" data-timestamp="2026-03-22T18:23:49.172Z">2026-03-22T18:23:49.172Z</time></a></div><div class="message-content"><div class="file-tool edit-tool" data-tool-id="toolu_01NHdwvTMzHimxyP1FuRXkaZ">
+<div class="file-tool-header edit-header"><span class="file-tool-icon">✏️</span> Edit <span class="file-tool-path">build_dashboard.py</span></div>
+<div class="file-tool-fullpath">/tmp/river-flows/build_dashboard.py</div>
+<div class="truncatable"><div class="truncatable-content">
+<div class="edit-section edit-old"><div class="edit-label">−</div><pre class="edit-content">def build_html(iv_data: dict, dv_data: dict) -&gt; str:
+    updated = datetime.now(timezone.utc).strftime(&#34;%Y-%m-%d %H:%M UTC&#34;)
+
+    # Build river sections
+    river_sections = &#34;&#34;
+    all_chart_data = {}  # river_name -&gt; {iv: [...], dv: [...]}
+
+    station_colors = [
+        &#34;#60a5fa&#34;, &#34;#34d399&#34;, &#34;#fbbf24&#34;, &#34;#f87171&#34;, &#34;#a78bfa&#34;,
+        &#34;#38bdf8&#34;, &#34;#4ade80&#34;, &#34;#facc15&#34;, &#34;#fb923c&#34;, &#34;#c084fc&#34;,
+    ]
+    color_idx = 0
+
+    for river_name, river_info in RIVERS.items():
+        river_color = river_info[&#34;color&#34;]
+        cards = &#34;&#34;
+        iv_datasets = []
+        dv_datasets = []
+
+        for site_id, label in river_info[&#34;stations&#34;].items():
+            iv = iv_data.get(site_id, {&#34;name&#34;: label, &#34;values&#34;: []})
+            dv = dv_data.get(site_id, {&#34;name&#34;: label, &#34;values&#34;: []})
+            name = iv.get(&#34;name&#34;) or dv.get(&#34;name&#34;) or label
+            color = station_colors[color_idx % len(station_colors)]
+            color_idx += 1
+
+            iv_stats = compute_stats(iv[&#34;values&#34;])
+            dv_stats = compute_stats(dv[&#34;values&#34;])
+            stats = iv_stats if iv_stats[&#34;current&#34;] is not None else dv_stats
+
+            current = f&#39;{stats[&#34;current&#34;]:.0f}&#39; if stats[&#34;current&#34;] is not None else &#34;N/A&#34;
+            has_data = stats[&#34;current&#34;] is not None
+            status_class = &#34;active&#34; if has_data else &#34;inactive&#34;
+
+            trend_html = &#34;&#34;
+            if stats[&#34;trend&#34;] is not None and has_data:
+                arrow = &#34;&amp;#9650;&#34; if stats[&#34;trend&#34;] &gt; 5 else &#34;&amp;#9660;&#34; if stats[&#34;trend&#34;] &lt; -5 else &#34;&amp;#9654;&#34;
+                trend_class = &#34;up&#34; if stats[&#34;trend&#34;] &gt; 5 else &#34;down&#34; if stats[&#34;trend&#34;] &lt; -5 else &#34;flat&#34;
+                trend_html = f&#39;&lt;span class=&#34;trend {trend_class}&#34;&gt;{arrow} {abs(stats[&#34;trend&#34;]):.0f}%&lt;/span&gt;&#39;
+
+            stats_row = &#34;&#34;
+            if has_data:
+                s = iv_stats if iv_stats[&#34;current&#34;] is not None else dv_stats
+                stats_row = f&#34;&#34;&#34;
+                &lt;div class=&#34;stats-row&#34;&gt;
+                  &lt;div class=&#34;stat&#34;&gt;&lt;span class=&#34;stat-label&#34;&gt;Min&lt;/span&gt;&lt;span class=&#34;stat-value&#34;&gt;{s[&#39;min&#39;]:.0f}&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&#34;stat&#34;&gt;&lt;span class=&#34;stat-label&#34;&gt;Avg&lt;/span&gt;&lt;span class=&#34;stat-value&#34;&gt;{s[&#39;avg&#39;]:.0f}&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&#34;stat&#34;&gt;&lt;span class=&#34;stat-label&#34;&gt;Max&lt;/span&gt;&lt;span class=&#34;stat-value&#34;&gt;{s[&#39;max&#39;]:.0f}&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;&#34;&#34;&#34;
+
+            cards += f&#34;&#34;&#34;
+            &lt;div class=&#34;card {status_class}&#34;&gt;
+              &lt;div class=&#34;card-dot&#34; style=&#34;background:{color}&#34;&gt;&lt;/div&gt;
+              &lt;div class=&#34;card-name&#34;&gt;{name}&lt;/div&gt;
+              &lt;div class=&#34;card-flow&#34;&gt;
+                &lt;span class=&#34;flow-value&#34;&gt;{current}&lt;/span&gt;
+                &lt;span class=&#34;flow-unit&#34;&gt;cfs&lt;/span&gt;
+                {trend_html}
+              &lt;/div&gt;
+              {stats_row}
+              &lt;div class=&#34;card-meta&#34;&gt;Site {site_id}&lt;/div&gt;
+            &lt;/div&gt;&#34;&#34;&#34;
+
+            if iv[&#34;values&#34;]:
+                iv_datasets.append({
+                    &#34;label&#34;: name,
+                    &#34;data&#34;: [{&#34;x&#34;: v[&#34;t&#34;], &#34;y&#34;: v[&#34;v&#34;]} for v in iv[&#34;values&#34;] if v[&#34;v&#34;] is not None],
+                    &#34;borderColor&#34;: color,
+                    &#34;backgroundColor&#34;: color + &#34;18&#34;,
+                    &#34;fill&#34;: True,
+                    &#34;tension&#34;: 0.3,
+                    &#34;pointRadius&#34;: 0,
+                    &#34;borderWidth&#34;: 2,
+                })
+
+            if dv[&#34;values&#34;]:
+                dv_datasets.append({
+                    &#34;label&#34;: name,
+                    &#34;data&#34;: [{&#34;x&#34;: v[&#34;t&#34;], &#34;y&#34;: v[&#34;v&#34;]} for v in dv[&#34;values&#34;] if v[&#34;v&#34;] is not None],
+                    &#34;borderColor&#34;: color,
+                    &#34;backgroundColor&#34;: color + &#34;18&#34;,
+                    &#34;fill&#34;: True,
+                    &#34;tension&#34;: 0.3,
+                    &#34;pointRadius&#34;: 0,
+                    &#34;borderWidth&#34;: 2,
+                })
+
+        river_id = river_name.replace(&#34; &#34;, &#34;&#34;).lower()
+        all_chart_data[river_id] = {&#34;iv&#34;: iv_datasets, &#34;dv&#34;: dv_datasets}
+
+        river_sections += f&#34;&#34;&#34;
+        &lt;section class=&#34;river-section&#34;&gt;
+          &lt;h2 class=&#34;river-title&#34;&gt;&lt;span class=&#34;river-dot&#34; style=&#34;background:{river_color}&#34;&gt;&lt;/span&gt;{river_name}&lt;/h2&gt;
+          &lt;div class=&#34;cards&#34;&gt;{cards}&lt;/div&gt;
+          &lt;div class=&#34;chart-panel&#34;&gt;
+            &lt;div class=&#34;chart-tabs&#34;&gt;
+              &lt;button class=&#34;tab active&#34; onclick=&#34;showTab(&#39;{river_id}&#39;, &#39;7d&#39;)&#34;&gt;7 Day&lt;/button&gt;
+              &lt;button class=&#34;tab&#34; onclick=&#34;showTab(&#39;{river_id}&#39;, &#39;365d&#39;)&#34;&gt;365 Day&lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div class=&#34;chart-wrap&#34;&gt;
+              &lt;canvas id=&#34;{river_id}-7d&#34;&gt;&lt;/canvas&gt;
+              &lt;canvas id=&#34;{river_id}-365d&#34; style=&#34;display:none&#34;&gt;&lt;/canvas&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;&#34;&#34;&#34;
+
+    chart_data_json = json.dumps(all_chart_data)
+
+    return f&#34;&#34;&#34;&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;UTF-8&#34;&gt;
+&lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+&lt;title&gt;California River Flows&lt;/title&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/chart.js@4&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3&#34;&gt;&lt;/script&gt;
+&lt;style&gt;
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+  body {{
+    font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, sans-serif;
+    background: #0f172a; color: #e2e8f0; line-height: 1.5;
+    padding: 1rem 1rem 2rem; max-width: 1200px; margin: 0 auto;
+  }}
+  header {{ margin-bottom: 2rem; }}
+  h1 {{ font-size: 1.6rem; font-weight: 700; }}
+  .subtitle {{ color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; }}
+  .river-section {{ margin-bottom: 2.5rem; }}
+  .river-title {{
+    font-size: 1.15rem; font-weight: 600; color: #f1f5f9;
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid #1e293b;
+  }}
+  .river-dot {{ width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }}
+  .cards {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem; margin-bottom: 1rem;
+  }}
+  .card {{
+    background: #1e293b; border-radius: 10px; padding: 1rem;
+    border: 1px solid #334155; position: relative; overflow: hidden;
+  }}
+  .card.inactive {{ opacity: 0.5; }}
+  .card-dot {{
+    width: 8px; height: 8px; border-radius: 50%;
+    position: absolute; top: 1rem; right: 1rem;
+  }}
+  .card-name {{ font-size: 0.78rem; color: #94a3b8; font-weight: 500; margin-bottom: 0.5rem; padding-right: 1rem; }}
+  .card-flow {{ display: flex; align-items: baseline; gap: 0.35rem; margin-bottom: 0.5rem; }}
+  .flow-value {{ font-size: 1.75rem; font-weight: 700; color: #f1f5f9; }}
+  .flow-unit {{ font-size: 0.8rem; color: #64748b; }}
+  .trend {{ font-size: 0.75rem; font-weight: 600; margin-left: 0.25rem; }}
+  .trend.up {{ color: #34d399; }}
+  .trend.down {{ color: #f87171; }}
+  .trend.flat {{ color: #94a3b8; }}
+  .stats-row {{
+    display: flex; gap: 1rem; padding-top: 0.5rem;
+    border-top: 1px solid #334155; margin-top: 0.25rem;
+  }}
+  .stat {{ display: flex; flex-direction: column; }}
+  .stat-label {{ font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }}
+  .stat-value {{ font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }}
+  .card-meta {{ font-size: 0.65rem; color: #475569; margin-top: 0.5rem; }}
+  .chart-panel {{
+    background: #1e293b; border-radius: 10px; padding: 1rem;
+    border: 1px solid #334155;
+  }}
+  .chart-tabs {{ display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }}
+  .tab {{
+    background: #0f172a; border: 1px solid #334155; color: #94a3b8;
+    padding: 0.35rem 1rem; border-radius: 6px; cursor: pointer;
+    font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
+  }}
+  .tab:hover {{ color: #e2e8f0; border-color: #475569; }}
+  .tab.active {{ background: #334155; color: #f1f5f9; border-color: #475569; }}
+  .chart-wrap {{ position: relative; height: 280px; }}
+  .chart-wrap canvas {{ position: absolute; inset: 0; }}
+  footer {{ text-align: center; color: #475569; font-size: 0.7rem; padding-top: 1rem; }}
+  @media (max-width: 600px) {{
+    h1 {{ font-size: 1.3rem; }}
+    .cards {{ grid-template-columns: 1fr; }}
+    .flow-value {{ font-size: 1.5rem; }}
+    .chart-wrap {{ height: 220px; }}
+  }}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;California River Flows&lt;/h1&gt;
+    &lt;p class=&#34;subtitle&#34;&gt;USGS real-time discharge &amp;middot; Updated {updated}&lt;/p&gt;
+  &lt;/header&gt;
+  {river_sections}
+  &lt;footer&gt;Data from USGS National Water Information System &amp;middot; &lt;a href=&#34;transcript/&#34; style=&#34;color:#64748b&#34;&gt;Build transcript&lt;/a&gt;&lt;/footer&gt;
+
+&lt;script&gt;
+const chartData = {chart_data_json};
+const charts = {{}};
+
+function makeChart(canvasId, datasets, timeUnit) {{
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  charts[canvasId] = new Chart(ctx, {{
+    type: &#39;line&#39;,
+    data: {{ datasets }},
+    options: {{
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {{ mode: &#39;index&#39;, intersect: false }},
+      plugins: {{
+        legend: {{ position: &#39;top&#39;, labels: {{ color: &#39;#94a3b8&#39;, usePointStyle: true, pointStyle: &#39;circle&#39;, boxWidth: 6, padding: 16, font: {{ size: 11 }} }} }},
+        tooltip: {{
+          backgroundColor: &#39;#1e293b&#39;, titleColor: &#39;#f1f5f9&#39;, bodyColor: &#39;#cbd5e1&#39;,
+          borderColor: &#39;#334155&#39;, borderWidth: 1, padding: 10,
+          callbacks: {{ label: ctx =&gt; ctx.dataset.label + &#39;: &#39; + (ctx.parsed.y?.toLocaleString() ?? &#39;N/A&#39;) + &#39; cfs&#39; }}
+        }}
+      }},
+      scales: {{
+        x: {{
+          type: &#39;time&#39;, time: {{ unit: timeUnit }},
+          ticks: {{ color: &#39;#64748b&#39;, maxTicksLimit: 8, font: {{ size: 10 }} }},
+          grid: {{ color: &#39;#1e293b&#39; }}
+        }},
+        y: {{
+          title: {{ display: true, text: &#39;cfs&#39;, color: &#39;#64748b&#39;, font: {{ size: 10 }} }},
+          ticks: {{ color: &#39;#64748b&#39;, font: {{ size: 10 }}, callback: v =&gt; v.toLocaleString() }},
+          grid: {{ color: &#39;#1e293b44&#39; }},
+          beginAtZero: true
+        }}
+      }}
+    }}
+  }});
+}}
+
+for (const [riverId, data] of Object.entries(chartData)) {{
+  makeChart(riverId + &#39;-7d&#39;, data.iv, &#39;day&#39;);
+  makeChart(riverId + &#39;-365d&#39;, data.dv, &#39;month&#39;);
+}}
+
+function showTab(riverId, period) {{
+  const section = document.getElementById(riverId + &#39;-7d&#39;)?.closest(&#39;.chart-panel&#39;);
+  if (!section) return;
+  section.querySelectorAll(&#39;canvas&#39;).forEach(c =&gt; c.style.display = &#39;none&#39;);
+  section.querySelectorAll(&#39;.tab&#39;).forEach(t =&gt; t.classList.remove(&#39;active&#39;));
+  const canvas = document.getElementById(riverId + &#39;-&#39; + period);
+  if (canvas) canvas.style.display = &#39;block&#39;;
+  const tabs = section.querySelectorAll(&#39;.tab&#39;);
+  tabs.forEach(t =&gt; {{ if (t.textContent.toLowerCase().includes(period.replace(&#39;d&#39;,&#39;&#39;))) t.classList.add(&#39;active&#39;); }});
+  const chartKey = riverId + &#39;-&#39; + period;
+  if (charts[chartKey]) charts[chartKey].resize();
+}}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;&#34;&#34;&#34;</pre></div>
+<div class="edit-section edit-new"><div class="edit-label">+</div><pre class="edit-content">def build_html(iv_data: dict, dv_data: dict) -&gt; str:
+    updated = datetime.now(timezone.utc).strftime(&#34;%Y-%m-%d %H:%M UTC&#34;)
+
+    river_sections = &#34;&#34;
+    all_chart_data = {}
+
+    station_colors_by_river = {
+        &#34;Kern River&#34;: [&#34;#4a90a4&#34;, &#34;#6bb5a0&#34;, &#34;#c4956a&#34;],
+        &#34;American River&#34;: [&#34;#b07d4b&#34;, &#34;#7a9e7e&#34;],
+    }
+    fallback_colors = [&#34;#4a90a4&#34;, &#34;#6bb5a0&#34;, &#34;#c4956a&#34;, &#34;#b07d4b&#34;, &#34;#7a9e7e&#34;]
+
+    river_idx = 0
+    for river_name, river_info in RIVERS.items():
+        cards = &#34;&#34;
+        iv_datasets = []
+        dv_datasets = []
+        palette = station_colors_by_river.get(river_name, fallback_colors)
+
+        for si, (site_id, label) in enumerate(river_info[&#34;stations&#34;].items()):
+            iv = iv_data.get(site_id, {&#34;name&#34;: label, &#34;values&#34;: []})
+            dv = dv_data.get(site_id, {&#34;name&#34;: label, &#34;values&#34;: []})
+            name = iv.get(&#34;name&#34;) or dv.get(&#34;name&#34;) or label
+            color = palette[si % len(palette)]
+
+            iv_stats = compute_stats(iv[&#34;values&#34;])
+            dv_stats = compute_stats(dv[&#34;values&#34;])
+            stats = iv_stats if iv_stats[&#34;current&#34;] is not None else dv_stats
+
+            current = f&#39;{stats[&#34;current&#34;]:,.0f}&#39; if stats[&#34;current&#34;] is not None else &#34;---&#34;
+            has_data = stats[&#34;current&#34;] is not None
+            status_class = &#34;active&#34; if has_data else &#34;inactive&#34;
+
+            trend_html = &#34;&#34;
+            if stats[&#34;trend&#34;] is not None and has_data:
+                if stats[&#34;trend&#34;] &gt; 5:
+                    arrow, trend_class = &#34;&amp;#8599;&#34;, &#34;rising&#34;
+                elif stats[&#34;trend&#34;] &lt; -5:
+                    arrow, trend_class = &#34;&amp;#8600;&#34;, &#34;falling&#34;
+                else:
+                    arrow, trend_class = &#34;&amp;#8594;&#34;, &#34;steady&#34;
+                trend_html = f&#39;&lt;span class=&#34;gauge-trend {trend_class}&#34;&gt;{arrow} {abs(stats[&#34;trend&#34;]):.0f}%&lt;/span&gt;&#39;
+
+            stats_row = &#34;&#34;
+            if has_data:
+                s = iv_stats if iv_stats[&#34;current&#34;] is not None else dv_stats
+                stats_row = f&#34;&#34;&#34;
+                &lt;div class=&#34;gauge-range&#34;&gt;
+                  &lt;div class=&#34;range-bar&#34;&gt;
+                    &lt;div class=&#34;range-fill&#34; style=&#34;--min:{s[&#39;min&#39;]};--max:{s[&#39;max&#39;]};--cur:{s[&#39;current&#39;]};--color:{color}&#34;&gt;&lt;/div&gt;
+                    &lt;div class=&#34;range-marker&#34; style=&#34;--min:{s[&#39;min&#39;]};--max:{s[&#39;max&#39;]};--cur:{s[&#39;current&#39;]}&#34;&gt;&lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;div class=&#34;range-labels&#34;&gt;
+                    &lt;span&gt;{s[&#39;min&#39;]:,.0f}&lt;/span&gt;
+                    &lt;span class=&#34;range-avg&#34;&gt;avg {s[&#39;avg&#39;]:,.0f}&lt;/span&gt;
+                    &lt;span&gt;{s[&#39;max&#39;]:,.0f}&lt;/span&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;&#34;&#34;&#34;
+
+            cards += f&#34;&#34;&#34;
+            &lt;div class=&#34;gauge {&#39;off&#39; if not has_data else &#39;&#39;}&#34; style=&#34;--accent:{color};animation-delay:{river_idx * 200 + si * 100}ms&#34;&gt;
+              &lt;div class=&#34;gauge-stripe&#34; style=&#34;background:{color}&#34;&gt;&lt;/div&gt;
+              &lt;div class=&#34;gauge-body&#34;&gt;
+                &lt;div class=&#34;gauge-header&#34;&gt;
+                  &lt;span class=&#34;gauge-id&#34;&gt;{site_id}&lt;/span&gt;
+                  &lt;span class=&#34;gauge-status {&#39;pulse&#39; if has_data else &#39;&#39;}&#34;&gt;&lt;/span&gt;
+                &lt;/div&gt;
+                &lt;div class=&#34;gauge-name&#34;&gt;{name}&lt;/div&gt;
+                &lt;div class=&#34;gauge-reading&#34;&gt;
+                  &lt;span class=&#34;reading-val&#34;&gt;{current}&lt;/span&gt;
+                  &lt;span class=&#34;reading-unit&#34;&gt;ft&amp;sup3;/s&lt;/span&gt;
+                  {trend_html}
+                &lt;/div&gt;
+                {stats_row}
+              &lt;/div&gt;
+            &lt;/div&gt;&#34;&#34;&#34;
+
+            if iv[&#34;values&#34;]:
+                iv_datasets.append({
+                    &#34;label&#34;: name,
+                    &#34;data&#34;: [{&#34;x&#34;: v[&#34;t&#34;], &#34;y&#34;: v[&#34;v&#34;]} for v in iv[&#34;values&#34;] if v[&#34;v&#34;] is not None],
+                    &#34;borderColor&#34;: color,
+                    &#34;backgroundColor&#34;: color + &#34;15&#34;,
+                    &#34;fill&#34;: True,
+                    &#34;tension&#34;: 0.4,
+                    &#34;pointRadius&#34;: 0,
+                    &#34;pointHitRadius&#34;: 8,
+                    &#34;borderWidth&#34;: 2.5,
+                })
+
+            if dv[&#34;values&#34;]:
+                dv_datasets.append({
+                    &#34;label&#34;: name,
+                    &#34;data&#34;: [{&#34;x&#34;: v[&#34;t&#34;], &#34;y&#34;: v[&#34;v&#34;]} for v in dv[&#34;values&#34;] if v[&#34;v&#34;] is not None],
+                    &#34;borderColor&#34;: color,
+                    &#34;backgroundColor&#34;: color + &#34;15&#34;,
+                    &#34;fill&#34;: True,
+                    &#34;tension&#34;: 0.4,
+                    &#34;pointRadius&#34;: 0,
+                    &#34;pointHitRadius&#34;: 8,
+                    &#34;borderWidth&#34;: 2.5,
+                })
+
+        river_id = river_name.replace(&#34; &#34;, &#34;&#34;).lower()
+        all_chart_data[river_id] = {&#34;iv&#34;: iv_datasets, &#34;dv&#34;: dv_datasets}
+
+        river_sections += f&#34;&#34;&#34;
+        &lt;section class=&#34;river&#34; id=&#34;sec-{river_id}&#34;&gt;
+          &lt;div class=&#34;river-header&#34;&gt;
+            &lt;svg class=&#34;river-icon&#34; viewBox=&#34;0 0 32 32&#34; fill=&#34;none&#34;&gt;&lt;path d=&#34;M4 16c4-6 8 6 12 0s8 6 12 0&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2.5&#34; stroke-linecap=&#34;round&#34;/&gt;&lt;path d=&#34;M4 22c4-6 8 6 12 0s8 6 12 0&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2.5&#34; stroke-linecap=&#34;round&#34; opacity=&#34;0.4&#34;/&gt;&lt;/svg&gt;
+            &lt;h2&gt;{river_name}&lt;/h2&gt;
+            &lt;span class=&#34;river-count&#34;&gt;{len(river_info[&#39;stations&#39;])} gauges&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&#34;gauges&#34;&gt;{cards}&lt;/div&gt;
+          &lt;div class=&#34;hydro&#34;&gt;
+            &lt;div class=&#34;hydro-toolbar&#34;&gt;
+              &lt;div class=&#34;hydro-tabs&#34;&gt;
+                &lt;button class=&#34;htab active&#34; onclick=&#34;showTab(&#39;{river_id}&#39;,&#39;7d&#39;)&#34;&gt;7d&lt;/button&gt;
+                &lt;button class=&#34;htab&#34; onclick=&#34;showTab(&#39;{river_id}&#39;,&#39;365d&#39;)&#34;&gt;1yr&lt;/button&gt;
+              &lt;/div&gt;
+              &lt;span class=&#34;hydro-label&#34;&gt;Discharge Hydrograph&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&#34;hydro-chart&#34;&gt;
+              &lt;canvas id=&#34;{river_id}-7d&#34;&gt;&lt;/canvas&gt;
+              &lt;canvas id=&#34;{river_id}-365d&#34; style=&#34;display:none&#34;&gt;&lt;/canvas&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;&#34;&#34;&#34;
+        river_idx += 1
+
+    chart_data_json = json.dumps(all_chart_data)
+
+    return f&#34;&#34;&#34;&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;UTF-8&#34;&gt;
+&lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+&lt;title&gt;California River Flows&lt;/title&gt;
+&lt;link rel=&#34;preconnect&#34; href=&#34;https://fonts.googleapis.com&#34;&gt;
+&lt;link rel=&#34;preconnect&#34; href=&#34;https://fonts.gstatic.com&#34; crossorigin&gt;
+&lt;link href=&#34;https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap&#34; rel=&#34;stylesheet&#34;&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/chart.js@4&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3&#34;&gt;&lt;/script&gt;
+&lt;style&gt;
+  :root {{
+    --bg: #1a1f16;
+    --bg2: #222819;
+    --bg3: #2a3120;
+    --sand: #d4c5a0;
+    --sand-dim: #9c9070;
+    --sand-bright: #e8dcc0;
+    --cream: #f0e8d4;
+    --water: #4a90a4;
+    --water-glow: #5cb8d4;
+    --bark: #8b7355;
+    --moss: #5a6b42;
+    --contour: #2a3120;
+    --danger: #c4654a;
+    --safe: #6bb5a0;
+  }}
+
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
+  body {{
+    font-family: &#39;IBM Plex Sans&#39;, sans-serif;
+    background: var(--bg);
+    color: var(--sand);
+    line-height: 1.5;
+    min-height: 100vh;
+    position: relative;
+  }}
+
+  body::before {{
+    content: &#39;&#39;;
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, var(--contour) 39px, var(--contour) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, var(--contour) 39px, var(--contour) 40px);
+    opacity: 0.3;
+  }}
+
+  body::after {{
+    content: &#39;&#39;;
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: url(&#34;data:image/svg+xml,%3Csvg width=&#39;400&#39; height=&#39;400&#39; xmlns=&#39;http://www.w3.org/2000/svg&#39;%3E%3Cfilter id=&#39;n&#39;%3E%3CfeTurbulence baseFrequency=&#39;0.9&#39; numOctaves=&#39;4&#39; stitchTiles=&#39;stitch&#39;/%3E%3C/filter%3E%3Crect width=&#39;100%25&#39; height=&#39;100%25&#39; filter=&#39;url(%23n)&#39; opacity=&#39;0.03&#39;/%3E%3C/svg%3E&#34;);
+    opacity: 0.6;
+  }}
+
+  .page {{ position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 3rem; }}
+
+  /* === HEADER === */
+  header {{
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--contour);
+    margin-bottom: 2.5rem;
+    position: relative;
+  }}
+  header::after {{
+    content: &#39;&#39;;
+    position: absolute; bottom: -1px; left: 0;
+    width: 120px; height: 3px;
+    background: var(--water);
+  }}
+
+  .header-eyebrow {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--sand-dim);
+    margin-bottom: 0.75rem;
+  }}
+
+  h1 {{
+    font-family: &#39;Playfair Display&#39;, serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--cream);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }}
+  h1 span {{
+    color: var(--water);
+  }}
+
+  .header-meta {{
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-top: 1rem;
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.72rem;
+    color: var(--sand-dim);
+  }}
+  .header-meta .dot {{ width: 6px; height: 6px; border-radius: 50%; background: var(--safe); animation: blink 2s infinite; }}
+  @keyframes blink {{ 0%,100% {{ opacity: 1 }} 50% {{ opacity: 0.3 }} }}
+
+  /* === RIVER SECTIONS === */
+  .river {{ margin-bottom: 3rem; }}
+  .river-header {{
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--contour);
+  }}
+  .river-icon {{ width: 28px; height: 28px; color: var(--water); flex-shrink: 0; }}
+  .river-header h2 {{
+    font-family: &#39;Playfair Display&#39;, serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }}
+  .river-count {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.65rem;
+    color: var(--sand-dim);
+    background: var(--bg2);
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid var(--contour);
+    margin-left: auto;
+  }}
+
+  /* === GAUGE CARDS === */
+  .gauges {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }}
+
+  .gauge {{
+    background: var(--bg2);
+    border: 1px solid var(--contour);
+    border-radius: 2px;
+    display: flex;
+    overflow: hidden;
+    animation: slideUp 0.5s ease both;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }}
+  .gauge:hover {{
+    border-color: var(--bark);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }}
+  .gauge.off {{ opacity: 0.45; }}
+
+  @keyframes slideUp {{
+    from {{ opacity: 0; transform: translateY(12px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+  }}
+
+  .gauge-stripe {{ width: 4px; flex-shrink: 0; }}
+  .gauge-body {{ padding: 0.9rem 1rem; flex: 1; min-width: 0; }}
+
+  .gauge-header {{
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.4rem;
+  }}
+  .gauge-id {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.65rem;
+    color: var(--sand-dim);
+    letter-spacing: 0.05em;
+  }}
+  .gauge-status {{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--sand-dim);
+  }}
+  .gauge-status.pulse {{
+    background: var(--safe);
+    box-shadow: 0 0 6px var(--safe);
+    animation: blink 2s infinite;
+  }}
+
+  .gauge-name {{
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--sand);
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }}
+
+  .gauge-reading {{
+    display: flex; align-items: baseline; gap: 0.3rem;
+    margin-bottom: 0.6rem;
+  }}
+  .reading-val {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }}
+  .reading-unit {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.7rem;
+    color: var(--sand-dim);
+  }}
+  .gauge-trend {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    margin-left: auto;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+  }}
+  .gauge-trend.rising {{ color: var(--safe); background: rgba(107,181,160,0.1); }}
+  .gauge-trend.falling {{ color: var(--danger); background: rgba(196,101,74,0.1); }}
+  .gauge-trend.steady {{ color: var(--sand-dim); background: rgba(156,144,112,0.1); }}
+
+  /* Range bar */
+  .gauge-range {{ margin-top: 0.25rem; }}
+  .range-bar {{
+    height: 4px; border-radius: 2px;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }}
+  .range-fill {{
+    position: absolute; inset: 0;
+    background: var(--color, var(--water));
+    opacity: 0.3;
+    border-radius: 2px;
+  }}
+  .range-marker {{
+    position: absolute; top: -2px;
+    width: 2px; height: 8px;
+    background: var(--cream);
+    border-radius: 1px;
+    left: calc((var(--cur) - var(--min)) / (var(--max) - var(--min) + 0.001) * 100%);
+  }}
+  .range-labels {{
+    display: flex; justify-content: space-between;
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.6rem;
+    color: var(--sand-dim);
+    margin-top: 0.3rem;
+  }}
+  .range-avg {{ color: var(--bark); }}
+
+  /* === HYDROGRAPH === */
+  .hydro {{
+    background: var(--bg2);
+    border: 1px solid var(--contour);
+    border-radius: 2px;
+    overflow: hidden;
+  }}
+  .hydro-toolbar {{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--contour);
+  }}
+  .hydro-tabs {{ display: flex; gap: 2px; }}
+  .htab {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.7rem; font-weight: 500;
+    padding: 0.3rem 0.8rem;
+    background: transparent; border: 1px solid var(--contour);
+    color: var(--sand-dim); cursor: pointer;
+    transition: all 0.15s;
+  }}
+  .htab:first-child {{ border-radius: 2px 0 0 2px; }}
+  .htab:last-child {{ border-radius: 0 2px 2px 0; }}
+  .htab:hover {{ color: var(--sand); }}
+  .htab.active {{
+    background: var(--water);
+    border-color: var(--water);
+    color: var(--bg);
+  }}
+  .hydro-label {{
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.65rem;
+    color: var(--sand-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }}
+  .hydro-chart {{
+    position: relative;
+    height: 300px;
+    padding: 1rem;
+  }}
+  .hydro-chart canvas {{
+    position: absolute;
+    inset: 0.75rem;
+  }}
+
+  /* === FOOTER === */
+  footer {{
+    border-top: 1px solid var(--contour);
+    padding: 1.5rem 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 0.5rem;
+    font-family: &#39;IBM Plex Mono&#39;, monospace;
+    font-size: 0.65rem;
+    color: var(--sand-dim);
+  }}
+  footer a {{
+    color: var(--water);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }}
+  footer a:hover {{ border-color: var(--water); }}
+
+  /* === TOPO DECORATION === */
+  .topo-lines {{
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px; height: 300px;
+    opacity: 0.08;
+    pointer-events: none;
+  }}
+
+  @media (max-width: 640px) {{
+    .page {{ padding: 0 1rem 2rem; }}
+    header {{ padding: 2rem 0 1.5rem; }}
+    .gauges {{ grid-template-columns: 1fr; }}
+    .reading-val {{ font-size: 1.5rem; }}
+    .hydro-chart {{ height: 220px; }}
+    .hydro-label {{ display: none; }}
+    footer {{ flex-direction: column; align-items: flex-start; }}
+  }}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&#34;page&#34;&gt;
+  &lt;header&gt;
+    &lt;svg class=&#34;topo-lines&#34; viewBox=&#34;0 0 300 300&#34; fill=&#34;none&#34;&gt;
+      &lt;ellipse cx=&#34;200&#34; cy=&#34;120&#34; rx=&#34;140&#34; ry=&#34;80&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;200&#34; cy=&#34;120&#34; rx=&#34;115&#34; ry=&#34;65&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;200&#34; cy=&#34;120&#34; rx=&#34;90&#34; ry=&#34;50&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;200&#34; cy=&#34;120&#34; rx=&#34;65&#34; ry=&#34;35&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;200&#34; cy=&#34;120&#34; rx=&#34;40&#34; ry=&#34;20&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;80&#34; cy=&#34;220&#34; rx=&#34;100&#34; ry=&#34;60&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;80&#34; cy=&#34;220&#34; rx=&#34;75&#34; ry=&#34;45&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+      &lt;ellipse cx=&#34;80&#34; cy=&#34;220&#34; rx=&#34;50&#34; ry=&#34;30&#34; stroke=&#34;var(--sand)&#34; stroke-width=&#34;0.5&#34;/&gt;
+    &lt;/svg&gt;
+    &lt;div class=&#34;header-eyebrow&#34;&gt;USGS National Water Information System&lt;/div&gt;
+    &lt;h1&gt;California&lt;br&gt;&lt;span&gt;River Flows&lt;/span&gt;&lt;/h1&gt;
+    &lt;div class=&#34;header-meta&#34;&gt;
+      &lt;span class=&#34;dot&#34;&gt;&lt;/span&gt;
+      &lt;span&gt;Live gauges&lt;/span&gt;
+      &lt;span&gt;&amp;middot;&lt;/span&gt;
+      &lt;span&gt;{updated}&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  {river_sections}
+
+  &lt;footer&gt;
+    &lt;span&gt;Data sourced from USGS NWIS waterservices&lt;/span&gt;
+    &lt;a href=&#34;transcript/&#34;&gt;Build transcript&lt;/a&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const CD = {chart_data_json};
+const charts = {{}};
+
+const gridColor = &#39;rgba(42,49,32,0.6)&#39;;
+const tickColor = &#39;#9c9070&#39;;
+const tooltipBg = &#39;#222819&#39;;
+const tooltipBorder = &#39;#2a3120&#39;;
+
+function makeChart(id, datasets, unit) {{
+  const el = document.getElementById(id);
+  if (!el) return;
+  charts[id] = new Chart(el, {{
+    type: &#39;line&#39;,
+    data: {{ datasets }},
+    options: {{
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {{ mode: &#39;index&#39;, intersect: false }},
+      plugins: {{
+        legend: {{
+          position: &#39;top&#39;,
+          align: &#39;end&#39;,
+          labels: {{
+            color: tickColor,
+            usePointStyle: true,
+            pointStyle: &#39;rectRounded&#39;,
+            boxWidth: 8,
+            padding: 20,
+            font: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 10 }}
+          }}
+        }},
+        tooltip: {{
+          backgroundColor: tooltipBg,
+          titleColor: &#39;#e8dcc0&#39;,
+          bodyColor: &#39;#d4c5a0&#39;,
+          borderColor: tooltipBorder,
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 2,
+          titleFont: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 11 }},
+          bodyFont: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 11 }},
+          callbacks: {{
+            label: c =&gt; &#39;  &#39; + c.dataset.label + &#39;: &#39; + (c.parsed.y?.toLocaleString() ?? &#39;---&#39;) + &#39; cfs&#39;
+          }}
+        }}
+      }},
+      scales: {{
+        x: {{
+          type: &#39;time&#39;,
+          time: {{ unit }},
+          ticks: {{ color: tickColor, maxTicksLimit: 8, font: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 10 }} }},
+          grid: {{ color: gridColor, lineWidth: 0.5 }},
+          border: {{ color: gridColor }}
+        }},
+        y: {{
+          title: {{ display: true, text: &#39;DISCHARGE (CFS)&#39;, color: tickColor, font: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 9 }}, padding: 8 }},
+          ticks: {{ color: tickColor, font: {{ family: &#34;&#39;IBM Plex Mono&#39;, monospace&#34;, size: 10 }}, callback: v =&gt; v.toLocaleString() }},
+          grid: {{ color: gridColor, lineWidth: 0.5 }},
+          border: {{ color: gridColor }},
+          beginAtZero: true
+        }}
+      }}
+    }}
+  }});
+}}
+
+Object.entries(CD).forEach(([id, d]) =&gt; {{
+  makeChart(id + &#39;-7d&#39;, d.iv, &#39;day&#39;);
+  makeChart(id + &#39;-365d&#39;, d.dv, &#39;month&#39;);
+}});
+
+function showTab(rid, period) {{
+  const wrap = document.getElementById(rid + &#39;-7d&#39;)?.closest(&#39;.hydro&#39;);
+  if (!wrap) return;
+  wrap.querySelectorAll(&#39;canvas&#39;).forEach(c =&gt; c.style.display = &#39;none&#39;);
+  wrap.querySelectorAll(&#39;.htab&#39;).forEach(t =&gt; t.classList.remove(&#39;active&#39;));
+  const cv = document.getElementById(rid + &#39;-&#39; + period);
+  if (cv) cv.style.display = &#39;block&#39;;
+  wrap.querySelectorAll(&#39;.htab&#39;).forEach(t =&gt; {{
+    if ((period === &#39;7d&#39; &amp;&amp; t.textContent === &#39;7d&#39;) || (period === &#39;365d&#39; &amp;&amp; t.textContent === &#39;1yr&#39;))
+      t.classList.add(&#39;active&#39;);
+  }});
+  const k = rid + &#39;-&#39; + period;
+  if (charts[k]) charts[k].resize();
+}}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;&#34;&#34;&#34;</pre></div>
+</div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-23-49-221Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-23-49-221Z" class="timestamp-link"><time datetime="2026-03-22T18:23:49.221Z" data-timestamp="2026-03-22T18:23:49.221Z">2026-03-22T18:23:49.221Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>The file /tmp/river-flows/build_dashboard.py has been updated successfully.</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-23-51-508Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-23-51-508Z" class="timestamp-link"><time datetime="2026-03-22T18:23:51.508Z" data-timestamp="2026-03-22T18:23:51.508Z">2026-03-22T18:23:51.508Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_01MYE4J39TivovVXW36YxzE6">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Rebuild dashboard with new design</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">cd /tmp/river-flows &amp;&amp; uv run build_dashboard.py 2&gt;&amp;1</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-23-53-585Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-23-53-585Z" class="timestamp-link"><time datetime="2026-03-22T18:23:53.585Z" data-timestamp="2026-03-22T18:23:53.585Z">2026-03-22T18:23:53.585Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>Fetching instantaneous values (7 days)...
+Fetching daily values (365 days)...
+Building dashboard...
+Wrote index.html
+Shell cwd was reset to /Users/nix</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-24-00-372Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-24-00-372Z" class="timestamp-link"><time datetime="2026-03-22T18:24:00.372Z" data-timestamp="2026-03-22T18:24:00.372Z">2026-03-22T18:24:00.372Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_01Ptza8xB9ZnYJxTyXh8aeCd">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Commit and push redesigned dashboard</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">cd /tmp/river-flows &amp;&amp; git add build_dashboard.py index.html &amp;&amp; git commit -m &#34;$(cat &lt;&lt;&#39;EOF&#39;
+Redesign with cartographic aesthetic
+
+Topographic map-inspired design: contour grid background, Playfair
+Display serif headings, IBM Plex Mono gauge readings, earth-tone
+palette (sand/moss/bark), pulsing status indicators, animated
+range bars, staggered card entrance animations, topo-line header
+decoration, and dashed survey-style section dividers.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) &lt;noreply@anthropic.com&gt;
+EOF
+)&#34; &amp;&amp; git push 2&gt;&amp;1</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-24-02-043Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-24-02-043Z" class="timestamp-link"><time datetime="2026-03-22T18:24:02.043Z" data-timestamp="2026-03-22T18:24:02.043Z">2026-03-22T18:24:02.043Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><div class="commit-card"><a href="https://github.com/nix-robot/river-flows/commit/b6b949d"><span class="commit-card-hash">b6b949d</span> Redesign with cartographic aesthetic</a></div><pre>Committer: Nix &lt;nix@nixbot.tarpon-banana.ts.net&gt;
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name &quot;Your Name&quot;
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 2 files changed, 1028 insertions(+), 323 deletions(-)
+To github.com:nix-robot/river-flows.git
+   a535d3d..b6b949d  main -&gt; main
+Shell cwd was reset to /Users/nix</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-24-07-111Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-24-07-111Z" class="timestamp-link"><time datetime="2026-03-22T18:24:07.111Z" data-timestamp="2026-03-22T18:24:07.111Z">2026-03-22T18:24:07.111Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_019EpyaXrW6uwqgch7PfYqvj"><div class="tool-header"><span class="tool-icon">⚙</span> mcp__plugin_telegram_telegram__reply</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;chat_id&#34;: &#34;8082111581&#34;,
+  &#34;text&#34;: &#34;Redesigned with a cartographic/topographic map aesthetic:\n\n- Playfair Display serif headings + IBM Plex Mono for gauge readings\n- Earth-tone palette (sand, moss, bark) on dark forest-green background\n- Contour grid lines + topo-line header decoration\n- Pulsing green status indicators for live gauges\n- Range bars showing current reading position within min/max\n- Trend badges (rising/falling/steady)\n- Staggered card entrance animations\n- Dashed survey-style section dividers\n\nhttps://nix-robot.github.io/river-flows/&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-24-07-412Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-24-07-412Z" class="timestamp-link"><time datetime="2026-03-22T18:24:07.412Z" data-timestamp="2026-03-22T18:24:07.412Z">2026-03-22T18:24:07.412Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>sent (id: 27)</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-24-09-651Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-24-09-651Z" class="timestamp-link"><time datetime="2026-03-22T18:24:09.651Z" data-timestamp="2026-03-22T18:24:09.651Z">2026-03-22T18:24:09.651Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Waiting for the next message.</p></div></div></div>
+<div class="message user" id="msg-2026-03-22T18-24-45-810Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-03-22T18-24-45-810Z" class="timestamp-link"><time datetime="2026-03-22T18:24:45.810Z" data-timestamp="2026-03-22T18:24:45.810Z">2026-03-22T18:24:45.810Z</time></a></div><div class="message-content">
+<div class="user-content"><p><channel source="plugin:telegram:telegram" chat_id="8082111581" message_id="28" user="mikeastock" user_id="8082111581" ts="2026-03-22T18:24:45.000Z">
+Re create the transcript commit and push
+</channel></p></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-24-56-989Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-24-56-989Z" class="timestamp-link"><time datetime="2026-03-22T18:24:56.989Z" data-timestamp="2026-03-22T18:24:56.989Z">2026-03-22T18:24:56.989Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_01WxeBp3ipxvUN7kFNjCfKSs">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Regenerate transcript from current session (trimmed after pairing)</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">rm -rf /tmp/river-flows/transcript &amp;&amp; uvx claude-code-transcripts json /Users/nix/.claude/projects/-Users-nix/ffacfe14-f0fb-4be1-87de-73cb47dc0802.jsonl -o /tmp/river-flows/transcript --repo nix-robot/river-flows 2&gt;&amp;1</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-03-22T18-24-57-449Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-03-22T18-24-57-449Z" class="timestamp-link"><time datetime="2026-03-22T18:24:57.449Z" data-timestamp="2026-03-22T18:24:57.449Z">2026-03-22T18:24:57.449Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>Generated page-001.html
+Generated page-002.html
+Generated page-003.html
+Generated /private/tmp/river-flows/transcript/index.html (14 prompts, 3 pages)
+Output: /private/tmp/river-flows/transcript</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-03-22T18-25-03-444Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-03-22T18-25-03-444Z" class="timestamp-link"><time datetime="2026-03-22T18:25:03.444Z" data-timestamp="2026-03-22T18:25:03.444Z">2026-03-22T18:25:03.444Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div></div></div></div>
+        
+
+<div class="pagination">
+<a href="index.html" class="index-link">Index</a>
+<a href="page-002.html">&larr; Prev</a>
+<a href="page-001.html">1</a>
+<a href="page-002.html">2</a>
+<span class="current">3</span>
+<span class="disabled">Next &rarr;</span>
+</div>
+
+    </div>
+    <script>
+document.querySelectorAll('time[data-timestamp]').forEach(function(el) {
+    const timestamp = el.getAttribute('data-timestamp');
+    const date = new Date(timestamp);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    if (isToday) { el.textContent = timeStr; }
+    else { el.textContent = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + timeStr; }
+});
+document.querySelectorAll('pre.json').forEach(function(el) {
+    let text = el.textContent;
+    text = text.replace(/"([^"]+)":/g, '<span style="color: #ce93d8">"$1"</span>:');
+    text = text.replace(/: "([^"]*)"/g, ': <span style="color: #81d4fa">"$1"</span>');
+    text = text.replace(/: (\d+)/g, ': <span style="color: #ffcc80">$1</span>');
+    text = text.replace(/: (true|false|null)/g, ': <span style="color: #f48fb1">$1</span>');
+    el.innerHTML = text;
+});
+document.querySelectorAll('.truncatable').forEach(function(wrapper) {
+    const content = wrapper.querySelector('.truncatable-content');
+    const btn = wrapper.querySelector('.expand-btn');
+    if (content.scrollHeight > 250) {
+        wrapper.classList.add('truncated');
+        btn.addEventListener('click', function() {
+            if (wrapper.classList.contains('truncated')) { wrapper.classList.remove('truncated'); wrapper.classList.add('expanded'); btn.textContent = 'Show less'; }
+            else { wrapper.classList.remove('expanded'); wrapper.classList.add('truncated'); btn.textContent = 'Show more'; }
+        });
+    }
+});
+</script>
+</body>
+</html>
