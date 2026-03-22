@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["httpx"]
 # ///
-"""Fetch USGS flow data for Kern River stations and build a static HTML dashboard."""
+"""Fetch USGS flow data for California river stations and build a static HTML dashboard."""
 
 import httpx
 import json
@@ -13,6 +13,8 @@ STATIONS = {
     "11189500": "SF Kern River nr Onyx",
     "11186000": "Kern River nr Kernville",
     "11194152": "Kern River at Bakersfield",
+    "11427000": "NF American River at North Fork Dam",
+    "11446500": "American River at Fair Oaks",
 }
 
 USGS_IV_URL = "https://waterservices.usgs.gov/nwis/iv/"
@@ -73,7 +75,7 @@ def build_html(iv_data: dict, dv_data: dict) -> str:
     cards_html = ""
     chart_datasets_iv = []
     chart_datasets_dv = []
-    colors = ["#2563eb", "#059669", "#d97706"]
+    colors = ["#2563eb", "#059669", "#d97706", "#dc2626", "#8b5cf6"]
 
     active_stations = []
     for i, (site_id, label) in enumerate(STATIONS.items()):
@@ -156,7 +158,7 @@ def build_html(iv_data: dict, dv_data: dict) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kern River Flows</title>
+<title>California River Flows</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 <style>
@@ -192,7 +194,7 @@ def build_html(iv_data: dict, dv_data: dict) -> str:
 </style>
 </head>
 <body>
-  <h1>Kern River Flows</h1>
+  <h1>California River Flows</h1>
   <p class="subtitle">USGS real-time discharge data &middot; Updated {updated}</p>
   <div class="cards">{cards_html}</div>
 
